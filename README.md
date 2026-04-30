@@ -1,6 +1,10 @@
 # Evaluating the Security Posture of Default IaaS Configurations: Azure vs Google Cloud
 
-*(Cloud Security Assessment Lead — IAM, Network Security & Recommendations)*
+**Course:** Cloud Computing — AIT 664
+**Institution:** George Mason University
+**Team:** Akshaykumar Kathirvelu *(Cloud Security Assessment Lead — IAM, Network Security & Recommendations)* · Youssef · Hemanshu · Pooja Sri · Srikanth Reddy · Mahalakshmi
+
+---
 
 ## Overview
 
@@ -21,15 +25,18 @@ cloud-security-iaas/
 │
 ├── docs/
 │   ├── IaaS-Security-Posture-Azure-vs-GCP.docx   ← Full research report
-│   └── IaaS-Security-Posture-Presentation.pptx   ← Presentation deck
+│   └── IaaS-Security-Posture-Presentation.pptx   ← Presentation deck (presented April 2025)
 │
 ├── analysis/
 │   ├── vm-configuration-comparison.md            ← Azure vs GCP VM defaults side-by-side
-│   ├── storage-security-comparison.md            ← Storage access, encryption, key management
+│   ├── storage-security-comparison.md            ← Storage access, encryption, public access defaults
+│   ├── key-management-comparison.md              ← PMK vs CMK/CMEK, Key Vault vs Cloud KMS
 │   └── logging-monitoring-gaps.md               ← Default logging gaps and what they miss
 │
-└── recommendations/
-    └── hardening-checklist.md                   ← Actionable hardening steps for both platforms
+├── recommendations/
+│   └── hardening-checklist.md                   ← Actionable hardening steps for both platforms
+│
+└── references.md                                 ← All sources and frameworks referenced
 ```
 
 ---
@@ -60,6 +67,7 @@ We then examined each configuration against documented security best practices (
 | Double Encryption | **Disabled** | Platform-managed keys only — no customer key control by default |
 | VM Monitoring / Diagnostics | **Optional** | Boot diagnostics and performance metrics require manual activation |
 | Managed Identity Permissions | Over-permissioned | Default role assignments broader than least-privilege requires |
+| Log Retention | 30 days (Activity Logs), up to 90 days (some Log Analytics tables) | Insufficient for PCI-DSS (12 months), HIPAA (6 years) |
 
 ### GCP — Default Configuration Gaps
 
@@ -70,11 +78,12 @@ We then examined each configuration against documented security best practices (
 | Default Service Account Permissions | Editor-level | Broad project-wide permissions — significant privilege escalation surface |
 | CMEK (Customer-Managed Keys) | **Not enabled** | Google-managed keys used by default — no customer key lifecycle control |
 | Firewall Rule Logging | **Disabled** | Firewall activity is not logged unless manually configured |
+| Log Retention | 30 days default | Extendable via Cloud Storage routing, but requires manual setup |
 
 ### Where GCP Has an Edge by Default
 - Public access on Cloud Storage is **disabled** by default — Azure enables it
 - IAM supports object-level policies natively — no need for SAS tokens
-- 365-day free log retention via Cloud Storage (Azure defaults to 30–90 days)
+- 365-day free log retention via Cloud Storage (Azure defaults to 30–90 days depending on log type)
 - Workload Identity Federation eliminates long-lived service account keys
 
 ### Where Azure Has an Edge by Default
@@ -82,6 +91,16 @@ We then examined each configuration against documented security best practices (
 - Azure AD + RBAC provides deep hybrid enterprise identity management
 - Double encryption option (though not enabled by default)
 - Tighter integration with enterprise compliance tools (Compliance Manager, Secure Score)
+
+---
+
+## The Shared Responsibility Model in Practice
+
+Both Azure and GCP operate on the **Shared Responsibility Model** — a fundamental principle of cloud security that defines what the cloud provider secures versus what the customer is responsible for. In an IaaS context, the provider handles physical infrastructure, hypervisor security, and network hardware. Everything above that — operating system configuration, IAM policies, encryption key management, network logging, and application security — is the customer's responsibility.
+
+This project is essentially a deep dive into that boundary. The default configurations on both platforms represent the minimum the provider does on your behalf. Every gap documented in this project — disabled flow logs, over-permissioned service accounts, platform-managed encryption keys — is a place where the customer's responsibility begins and where organizations routinely fall short because they assume the cloud is "secure by default."
+
+It isn't. The defaults are a starting point, not a finished posture.
 
 ---
 
@@ -109,3 +128,14 @@ See [`recommendations/hardening-checklist.md`](recommendations/hardening-checkli
 - Cloud logging and monitoring — Azure Monitor, Sentinel, Cloud Logging, SCC
 - CIS Benchmarks and NIST framework alignment
 - Comparative security analysis and risk documentation
+
+---
+
+## Relevance to AZ-900
+
+This project maps directly to the security domains covered in the AZ-900 Azure Fundamentals certification: cloud security models, identity and access management, network security, data protection, and compliance. Running through these default configurations hands-on is a more effective prep exercise than any practice exam.
+
+---
+
+*Group project — Cloud Computing course (AIT 664), George Mason University.*
+*MS Applied Information Technology, Cybersecurity concentration.*
