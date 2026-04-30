@@ -1,5 +1,7 @@
 # Key Management: Azure vs GCP
 
+**Last validated:** April 2025
+
 **Scope:** Encryption key management defaults and options on Azure Blob Storage and GCP Cloud Storage, and across VM-attached storage.
 
 Key management is where the gap between "encrypted by default" and "actually secure" becomes most visible. Both platforms encrypt everything at rest automatically — but who controls the keys, and how, determines whether that encryption is meaningful in a breach scenario or a compliance audit.
@@ -122,3 +124,5 @@ Neither platform activates CMK/CMEK by default. For any workload subject to regu
 ---
 
 *Both platforms require manual configuration to move from platform-managed to customer-managed keys. This is not optional for HIPAA, PCI-DSS, FedRAMP, or any framework that requires customer key custody.*
+
+*See also: [`storage-security-comparison.md`](storage-security-comparison.md) for storage access controls | [`hardening-checklist.md`](../recommendations/hardening-checklist.md) for CMEK enablement steps*
