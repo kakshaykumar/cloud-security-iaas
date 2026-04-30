@@ -22,8 +22,8 @@ cloud-security-iaas/
 ├── README.md                                      ← You are here
 │
 ├── docs/
-│   ├── IaaS-Security-Posture-Azure-vs-GCP.docx   ← Full research report
-│   └── IaaS-Security-Posture-Presentation.pptx   ← Presentation deck (presented April 2025)
+│   ├── IaaS-Security-Posture-Azure-vs-GCP.pdf   ← Full research report
+│   └── IaaS-Security-Posture-Presentation.pdf   ← Presentation deck (presented April 2025)
 │
 ├── analysis/
 │   ├── vm-configuration-comparison.md            ← Azure vs GCP VM defaults side-by-side
