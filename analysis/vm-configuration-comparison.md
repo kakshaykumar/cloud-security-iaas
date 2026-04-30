@@ -1,5 +1,6 @@
 # VM Configuration Comparison: Azure vs GCP Defaults
 
+**Last validated:** April 2025
 **Scope:** Default IaaS virtual machine configuration on both platforms
 **Azure VM:** B1s (Free Tier) via Azure Portal
 **GCP VM:** e2-micro (Free Tier) via Google Cloud Console
@@ -17,7 +18,7 @@
 | Network | VNet + NSG | VPC + Firewall Rules |
 | Flow Logs | **Disabled by default** | **Disabled by default** |
 | Monitoring | Boot diagnostics (optional) | Cloud Logging (optional) |
-| SIEM | Microsoft Sentinel (native) | Chronicle (Google-native SIEM) |
+| SIEM | Microsoft Sentinel (native) | Chronicle (Google-native) |
 | Audit Logs | Activity Logs, Diagnostic Settings | Cloud Audit Logs (Admin, Access, Data) |
 | Log Retention | 30–90 days default | 30 days default, extendable via Cloud Storage |
 | Compliance Tools | Azure Policy, Secure Score, Compliance Manager | Org Policy, SCC Recommendations, Access Transparency |
@@ -28,10 +29,10 @@
 
 | Security Element | Azure Default | Azure Hardened | GCP Default | GCP Hardened |
 |---|---|---|---|---|
-| Access Control | Azure AD + RBAC | Custom roles, just-in-time access | IAM + default service account | Scoped service account, Workload Identity |
+| Access Control | Microsoft Entra ID + RBAC | Custom roles, just-in-time access | IAM + default service account | Scoped service account, Workload Identity |
 | Encryption at Rest | AES-256 (PMK) | CMK via Key Vault | AES-256 (Google-managed) | CMEK via Cloud KMS |
 | Encryption in Transit | TLS 1.2+ | TLS 1.3 enforced | TLS 1.2+ | TLS 1.3 enforced |
-| Key Management | Azure Key Vault (not activated) | CMK/CSK enabled, rotation automated | Cloud KMS (not activated) | CMEK enabled, rotation scheduled |
+| Key Management | Azure Key Vault (not activated) | CMK enabled, rotation automated (CSK as advanced option) | Cloud KMS (not activated) | CMEK enabled, rotation scheduled |
 | Threat Detection | Defender for Cloud (basic) | Defender with custom policies | Security Command Center (basic) | SCC Premium + custom findings |
 | Network Logging | NSG Flow Logs off | NSG Flow Logs enabled + Sentinel | VPC Flow Logs off | VPC Flow Logs enabled + Chronicle |
 
@@ -40,7 +41,7 @@
 ## Identity and Access — The Real Gaps
 
 ### Azure
-Azure uses Azure AD in conjunction with RBAC, which provides role assignments at subscription, resource group, or VM level. Managed Identities let VMs authenticate to other Azure services without storing credentials.
+Azure uses **Microsoft Entra ID** (formerly Azure Active Directory) in conjunction with RBAC, which provides role assignments at subscription, resource group, or VM level. Managed Identities let VMs authenticate to other Azure services without storing credentials.
 
 **The default gap:** Over-permissioned role assignments are common in default deployments. The built-in Contributor or Owner roles give far broader access than a VM actually needs to function. Most environments should be using custom roles scoped to specific resource operations.
 
@@ -66,8 +67,18 @@ The security consequence is direct: if an attacker gains access and begins later
 
 ---
 
-## Shielded VMs (GCP Advantage)
+## Boot Integrity and Firmware Security: Azure and GCP
 
-GCP supports Shielded VMs — instances that use Secure Boot, vTPM, and integrity monitoring to protect against rootkits and firmware-level attacks. This is a meaningful security capability that Azure doesn't offer in an equivalent default form.
+Both platforms offer hardware-backed boot integrity protections, though they differ in availability and naming.
 
-For high-security workloads, Shielded VMs should be the default choice on GCP.
+### GCP — Shielded VMs
+GCP supports Shielded VMs, which use Secure Boot, vTPM (virtual Trusted Platform Module), and integrity monitoring to protect against rootkits, bootkit attacks, and firmware tampering. Shielded VMs are available for most machine types and should be selected explicitly during VM creation — they are not the default for all configurations.
+
+### Azure — Trusted Launch
+Azure offers **Trusted Launch** for Generation 2 VMs, providing equivalent capabilities: Secure Boot, vTPM, and boot integrity monitoring via Defender for Cloud. Trusted Launch is enabled by default for Generation 2 VMs in most current Azure regions, making it Azure's answer to GCP Shielded VMs.
+
+**Summary:** Both platforms provide boot-level security features. GCP Shielded VMs require explicit selection; Azure Trusted Launch is default for Gen 2 VMs in supported regions. Neither platform should be assumed to have these protections active without verifying the VM generation and configuration at provisioning time.
+
+---
+
+*See also: [`key-management-comparison.md`](key-management-comparison.md) for encryption and key management defaults | [`logging-monitoring-gaps.md`](logging-monitoring-gaps.md) for flow log enablement steps*
