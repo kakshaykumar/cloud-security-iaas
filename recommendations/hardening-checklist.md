@@ -11,7 +11,7 @@ Based on findings from our evaluation of default IaaS configurations. These are 
 - [ ] Enable just-in-time (JIT) VM access via Defender for Cloud — eliminates persistent inbound SSH/RDP
 - [ ] Activate Managed Identities for all VMs that need to access other Azure services (avoid storing credentials in code or config)
 - [ ] Review and scope down all Service Principal permissions
-- [ ] Enable Azure AD Conditional Access policies for management plane access
+- [ ] Enable Microsoft Entra ID Conditional Access policies for management plane access
 - [ ] Enable PIM (Privileged Identity Management) for all privileged role assignments
 
 ### Network Security
@@ -41,7 +41,7 @@ Based on findings from our evaluation of default IaaS configurations. These are 
 - [ ] Set Log Analytics retention to 90+ days; route older logs to Storage Account for compliance
 - [ ] Configure custom alert rules in Sentinel — don't rely on default thresholds
 - [ ] Enable Defender for Cloud Standard tier on all production subscriptions
-- [ ] Configure email/Slack/PagerDuty notifications for high-severity alerts
+- [ ] Configure notifications for high-severity alerts via email, on-call platforms (e.g., PagerDuty), or messaging tools (e.g., Slack) — use whatever fits your organization's incident workflow
 
 ### Compliance
 - [ ] Apply Azure Policy initiatives (CIS Azure Benchmark, NIST SP 800-53)
@@ -58,7 +58,7 @@ Based on findings from our evaluation of default IaaS configurations. These are 
 - [ ] Use Workload Identity Federation for external workloads — eliminates long-lived service account keys
 - [ ] Implement org-level IAM policies using Organization Policy Service
 - [ ] Enable Access Transparency to audit Google employee access to your data
-- [ ] Regularly audit service account key age — rotate or eliminate any keys older than 90 days
+- [ ] Regularly audit service account key age — rotate or eliminate any keys older than 90 days (`gcloud iam service-accounts keys list --iam-account=<sa-email>`)
 
 ### Network Security
 - [ ] **Enable VPC Flow Logs on every subnet** (disabled by default)
@@ -93,7 +93,7 @@ Based on findings from our evaluation of default IaaS configurations. These are 
 ### Compliance
 - [ ] Apply Organization Policy constraints (CIS GCP Benchmark recommendations)
 - [ ] Enable Security Command Center's compliance monitoring for relevant standards
-- [ ] Configure Forseti Security or equivalent for continuous compliance scanning
+- [ ] Configure continuous compliance posture monitoring using Security Command Center Premium built-in compliance reports, or a third-party CSPM tool (e.g., Wiz, Orca Security, or Prisma Cloud)
 - [ ] Review SCC security findings and prioritize HIGH/CRITICAL remediations
 
 ---
@@ -112,5 +112,5 @@ Everything else builds on these foundations.
 
 ---
 
-*Based on CIS Microsoft Azure Foundations Benchmark and CIS Google Cloud Platform Foundation Benchmark.*
+*Based on CIS Microsoft Azure Foundations Benchmark v3.0.0 and CIS Google Cloud Platform Foundation Benchmark v3.0.0.*
 *Also aligned with NIST SP 800-53 (Security and Privacy Controls for Information Systems) and NIST SP 800-144 (Guidelines on Security and Privacy in Public Cloud Computing).*
