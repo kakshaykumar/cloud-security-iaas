@@ -1,8 +1,6 @@
 # Evaluating the Security Posture of Default IaaS Configurations: Azure vs Google Cloud
 
-**Course:** Cloud Computing — AIT 664
-**Institution:** George Mason University
-**Team:** Akshaykumar Kathirvelu *(Cloud Security Assessment Lead — IAM, Network Security & Recommendations)* · Youssef · Hemanshu · Pooja Sri · Srikanth Reddy · Mahalakshmi
+*(Cloud Security Assessment Lead — IAM, Network Security & Recommendations)*
 
 ---
 
