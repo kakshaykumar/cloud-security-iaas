@@ -8,7 +8,7 @@
 
 Most cloud security incidents don't start with sophisticated attacks — they start with someone deploying a resource with default settings and not knowing what those defaults actually mean. This project evaluates the default security posture of Infrastructure-as-a-Service (IaaS) configurations in Microsoft Azure and Google Cloud Platform (GCP), with the goal of identifying exactly where those defaults fall short and what needs to be done to fix them.
 
-We provisioned virtual machines and cloud storage on both platforms using only default settings, then systematically evaluated each across four dimensions: IAM and network controls, storage security, logging and monitoring, and encryption. The result is a direct, evidence-based comparison of where each platform starts you off — and what you still have to do yourself before you'd call it secure.
+Our team provisioned virtual machines and cloud storage on both platforms using only default settings, then systematically evaluated each across four dimensions: IAM and network controls, storage security, logging and monitoring, and encryption. The result is a direct, evidence-based comparison of where each platform starts you off — and what you still have to do yourself before you'd call it secure.
 
 This is directly relevant to real enterprise cloud deployments. Organizations frequently assume "cloud-native" means "secure by default." This project shows exactly why that assumption is wrong on both platforms — and documents the specific configurations that need to change.
 
@@ -22,8 +22,9 @@ cloud-security-iaas/
 ├── README.md                                      ← You are here
 │
 ├── docs/
-│   ├── IaaS-Security-Posture-Azure-vs-GCP.pdf   ← Full research report
-│   └── IaaS-Security-Posture-Presentation.pdf   ← Presentation deck (presented April 2025)
+│   ├── IaaS-Security-Posture-Azure-vs-GCP.pdf    ← Full research report
+│   ├── IaaS-Security-Posture-Presentation.pdf    ← Presentation deck (presented April 2025)
+│   └── README.md                                 ← Document index and abstracts
 │
 ├── analysis/
 │   ├── vm-configuration-comparison.md            ← Azure vs GCP VM defaults side-by-side
@@ -34,23 +35,35 @@ cloud-security-iaas/
 ├── recommendations/
 │   └── hardening-checklist.md                   ← Actionable hardening steps for both platforms
 │
-└── references.md                                 ← All sources and frameworks referenced
+├── references.md                                 ← All sources and frameworks referenced
+└── CHANGELOG.md                                  ← Version history and last-validated dates
 ```
 
 ---
 
-## What We Actually Did
+## How to Reproduce This Evaluation
 
-This wasn't a desk research project. We provisioned real resources on both platforms:
+The following prerequisites and steps were used to conduct the analysis. Results may differ as Azure and GCP update their default configurations over time — see `CHANGELOG.md` for the validation date of findings in this repository.
 
-- **Azure:** B1s VM via Azure Portal with default networking (NSG), authentication, and monitoring settings
-- **GCP:** e2-micro VM via Google Cloud Console with default VPC firewall rules and IAM service account assignment
+**Prerequisites:**
+- Active Azure subscription (free tier sufficient — B1s VM is within free tier limits)
+- Active GCP account (free tier sufficient — e2-micro VM is within free tier limits)
 
-For storage, we provisioned:
-- **Azure Blob Storage:** Default container with RBAC, verified public access settings
-- **Google Cloud Storage:** Default bucket, verified IAM policy scope and public access defaults
+**Azure steps:**
+1. Log in to [portal.azure.com](https://portal.azure.com)
+2. Create a new Resource Group in your preferred region (e.g., East US)
+3. Deploy a B1s VM using the Azure Marketplace default Ubuntu 22.04 image — accept all networking defaults (this auto-creates an NSG)
+4. Deploy an Azure Blob Storage account — note that public access is **enabled** by default
+5. Navigate to Azure Monitor → NSG Flow Logs and confirm they are **off** by default
+6. Navigate to Defender for Cloud and note the Secure Score baseline with no custom configuration
 
-We then examined each configuration against documented security best practices (CIS Benchmarks, NIST guidelines) and each platform's own security tooling (Defender for Cloud, Security Command Center).
+**GCP steps:**
+1. Log in to [console.cloud.google.com](https://console.cloud.google.com)
+2. Create a new project
+3. Deploy an e2-micro VM via Compute Engine using the default Debian image — accept all networking defaults (note the default service account assignment)
+4. Deploy a Cloud Storage bucket — note that public access is **blocked** by default
+5. Navigate to VPC Network → Flow Logs and confirm they are **off** by default
+6. Navigate to Security Command Center and review the default findings posture
 
 ---
 
@@ -64,7 +77,7 @@ We then examined each configuration against documented security best practices (
 | Public Access on Blob Storage | **Enabled** | Storage containers publicly accessible unless explicitly restricted |
 | Double Encryption | **Disabled** | Platform-managed keys only — no customer key control by default |
 | VM Monitoring / Diagnostics | **Optional** | Boot diagnostics and performance metrics require manual activation |
-| Managed Identity Permissions | Over-permissioned | Default role assignments broader than least-privilege requires |
+| Managed Identity Permissions | **Over-permissioned** | Default role assignments broader than least-privilege requires |
 | Log Retention | 30 days (Activity Logs), up to 90 days (some Log Analytics tables) | Insufficient for PCI-DSS (12 months), HIPAA (6 years) |
 
 ### GCP — Default Configuration Gaps
@@ -73,20 +86,20 @@ We then examined each configuration against documented security best practices (
 |---|---|---|
 | VPC Flow Logs | **Disabled** | Same network visibility gap as Azure — anomalous traffic goes unlogged |
 | Data Access Audit Logs | **Disabled** | No record of who reads or modifies stored data by default |
-| Default Service Account Permissions | Editor-level | Broad project-wide permissions — significant privilege escalation surface |
+| Default Service Account Permissions | **Editor-level** | Broad project-wide permissions — significant privilege escalation surface |
 | CMEK (Customer-Managed Keys) | **Not enabled** | Google-managed keys used by default — no customer key lifecycle control |
 | Firewall Rule Logging | **Disabled** | Firewall activity is not logged unless manually configured |
-| Log Retention | 30 days default | Extendable via Cloud Storage routing, but requires manual setup |
+| Log Retention | **30 days default** | Extendable via Cloud Storage routing, but requires manual setup |
 
 ### Where GCP Has an Edge by Default
 - Public access on Cloud Storage is **disabled** by default — Azure enables it
 - IAM supports object-level policies natively — no need for SAS tokens
-- 365-day free log retention via Cloud Storage (Azure defaults to 30–90 days depending on log type)
+- Logs can be routed to Cloud Storage for cost-effective long-term retention beyond 30 days (Azure routes to Log Analytics Workspace at higher cost per GB)
 - Workload Identity Federation eliminates long-lived service account keys
 
 ### Where Azure Has an Edge by Default
 - Native Microsoft Sentinel SIEM integration — Chronicle requires additional setup on GCP
-- Azure AD + RBAC provides deep hybrid enterprise identity management
+- Microsoft Entra ID + RBAC provides deep hybrid enterprise identity management
 - Double encryption option (though not enabled by default)
 - Tighter integration with enterprise compliance tools (Compliance Manager, Secure Score)
 
@@ -123,6 +136,6 @@ See [`recommendations/hardening-checklist.md`](recommendations/hardening-checkli
 - IaaS security configuration assessment
 - IAM design — RBAC, ABAC, service accounts, managed identities
 - Encryption at rest and in transit — AES-256, CMEK, CSEK, key management
-- Cloud logging and monitoring — Azure Monitor, Sentinel, Cloud Logging, SCC
-- CIS Benchmarks and NIST framework alignment
+- Cloud logging and monitoring — Azure Monitor, Microsoft Sentinel, Cloud Logging, SCC
+- CIS Benchmarks (v3.0.0) and NIST framework alignment
 - Comparative security analysis and risk documentation
