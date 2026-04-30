@@ -1,5 +1,7 @@
 # Logging & Monitoring: Default Gaps on Azure and GCP
 
+**Last validated:** April 2025
+
 The single most consistent finding across both platforms is this: the logs that matter most for security are not enabled by default.
 
 ---
@@ -97,3 +99,47 @@ For any production-grade deployment on either platform, these should be treated 
 - Enable Firewall Rule Logging for critical rules
 - Route logs to Cloud Storage for long-term retention beyond 30 days
 - Configure Security Command Center Premium for threat detection
+
+---
+
+## Verifying Enablement
+
+Enabling a control and confirming it works are two different things. After each enablement step, verify delivery:
+
+**Azure — Verify NSG Flow Logs:**
+```bash
+# In Azure Portal: Monitor → Network Watcher → NSG Flow Logs
+# Confirm status shows "Enabled" and the storage account is receiving .json log files
+# Or via CLI:
+az network watcher flow-log show --resource-group <rg> --nsg <nsg-name>
+```
+
+**Azure — Verify Diagnostic Settings:**
+```bash
+az monitor diagnostic-settings list --resource <resource-id>
+# Confirm logs are routing to Log Analytics Workspace or Storage Account
+```
+
+**GCP — Verify VPC Flow Logs:**
+```bash
+gcloud compute networks subnets describe <subnet-name> --region=<region> \
+  --format="get(enableFlowLogs)"
+# Should return: True
+```
+
+**GCP — Verify Data Access Audit Logs:**
+```bash
+gcloud projects get-iam-policy <project-id> --format=json | \
+  grep -A5 "auditLogConfigs"
+# Confirm DATA_READ and DATA_WRITE are listed for relevant services
+```
+
+**GCP — Verify logs are flowing to Cloud Storage (for long-term retention):**
+```bash
+gcloud logging sinks list
+# Confirm a sink exists routing to your Cloud Storage bucket
+```
+
+---
+
+*See also: [`vm-configuration-comparison.md`](vm-configuration-comparison.md) for network-level defaults | [`hardening-checklist.md`](../recommendations/hardening-checklist.md) for the full remediation checklist*
