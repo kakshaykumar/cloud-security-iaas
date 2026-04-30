@@ -1,5 +1,6 @@
 # Storage Security Comparison: Azure vs GCP Defaults
 
+**Last validated:** April 2025
 **Azure:** Azure Blob Storage (default container settings)
 **GCP:** Google Cloud Storage (default bucket settings)
 
@@ -48,7 +49,7 @@ This difference has real-world consequences. A significant number of cloud data 
 ## Authentication Models
 
 ### Azure
-- Azure AD integration for authentication
+- Microsoft Entra ID integration for authentication
 - RBAC roles at storage account, container, or object scope
 - Managed Identities for application authentication (no secrets in code)
 - Supports SAML, OIDC, and OAuth 2.0 federation
@@ -73,3 +74,5 @@ Neither platform does these things for you by default:
 - Restrict public access explicitly (Azure only — GCP handles this by default)
 - Enable storage access logging — reads, writes, and deletes against your buckets/containers are not logged unless you turn on storage analytics or GCS audit logging
 - Configure data lifecycle policies — automatic deletion or archival of aged data requires manual setup on both platforms
+
+*See also: [`key-management-comparison.md`](key-management-comparison.md) for key management details | [`vm-configuration-comparison.md`](vm-configuration-comparison.md) for VM-level access controls*
