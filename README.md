@@ -1,4 +1,4 @@
-# Evaluating the Security Posture of Default IaaS Configurations: Azure vs Google Cloud
+# Cloud Security Assessment: Azure vs GCP Default IaaS Security Review
 
 *(Cloud Security Assessment Lead — IAM, Network Security & Recommendations)*
 
