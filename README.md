@@ -1,14 +1,12 @@
 # Cloud Security Assessment: Azure vs GCP Default IaaS Security Review
 
-*(Cloud Security Assessment Lead — IAM, Network Security & Recommendations)*
-
 ---
 
 ## Overview
 
 Most cloud security incidents don't start with sophisticated attacks — they start with someone deploying a resource with default settings and not knowing what those defaults actually mean. This project evaluates the default security posture of Infrastructure-as-a-Service (IaaS) configurations in Microsoft Azure and Google Cloud Platform (GCP), with the goal of identifying exactly where those defaults fall short and what needs to be done to fix them.
 
-Our team provisioned virtual machines and cloud storage on both platforms using only default settings, then systematically evaluated each across four dimensions: IAM and network controls, storage security, logging and monitoring, and encryption. The result is a direct, evidence-based comparison of where each platform starts you off — and what you still have to do yourself before you'd call it secure.
+Provisioned virtual machines and cloud storage on both platforms using only default settings, then systematically evaluated each across four dimensions: IAM and network controls, storage security, logging and monitoring, and encryption.
 
 This is directly relevant to real enterprise cloud deployments. Organizations frequently assume "cloud-native" means "secure by default." This project shows exactly why that assumption is wrong on both platforms — and documents the specific configurations that need to change.
 
