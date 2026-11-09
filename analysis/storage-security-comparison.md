@@ -1,6 +1,6 @@
 # Storage Security Comparison: Azure vs GCP Defaults
 
-**Last validated:** April 2025
+**Last validated:** April 2025 (public access section corrected November 2026)
 **Azure:** Azure Blob Storage (default container settings)
 **GCP:** Google Cloud Storage (default bucket settings)
 
@@ -12,7 +12,7 @@
 |---|---|---|
 | Primary access model | RBAC (storage account / container level) | IAM (project, bucket, or object level) |
 | Object-level access | Shared Access Signatures (SAS) | Native IAM policies |
-| Public access default | **Enabled** — must be explicitly disabled | **Disabled** — private by default |
+| Public access default | **Disallowed** at account level for new accounts (since late 2023) — can be re-enabled per account | **Blocked** — public access prevention plus IAM; private by default |
 | Temporary access tokens | SAS tokens (time-limited, permission-scoped) | Signed URLs |
 | Secretless authentication | Managed Identities | Workload Identity Federation |
 
@@ -36,13 +36,13 @@ Both platforms encrypt all stored data with AES-256 by default. The difference i
 
 ---
 
-## Public Access: The Single Biggest Practical Gap
+## Public Access: Default vs Guardrail
 
-**Azure:** Public access on blob storage is enabled by default. A new storage account created with default settings will allow public reads on any container explicitly marked public. Organizations that don't audit their storage configuration during setup risk exposing sensitive data publicly.
+**Azure:** New storage accounts are created with anonymous blob access disallowed at the account level — a default Microsoft changed in late 2023. The remaining gap is enforcement: anyone with rights on the account can switch the setting back on and then mark a container public, and nothing blocks that unless an Azure Policy (for example, *Storage account public access should be disallowed*) is assigned. Accounts created before the change may still allow it.
 
 **GCP:** Public access is disabled by default. A new Cloud Storage bucket cannot be read publicly unless an IAM policy explicitly grants `allUsers` or `allAuthenticatedUsers` access. This is a stronger out-of-the-box posture.
 
-This difference has real-world consequences. A significant number of cloud data exposures traced to misconfigured storage involve Azure blobs left with public access enabled. GCP's default-deny posture for public access eliminates this entire class of misconfiguration.
+Both platforms now start private. The practical difference is how easily that can be undone: GCP's public access prevention can be enforced as an organization policy, while Azure's protection depends on an account setting unless a policy is in place.
 
 ---
 
@@ -71,7 +71,7 @@ This difference has real-world consequences. A significant number of cloud data 
 Neither platform does these things for you by default:
 
 - Enable CMEK/CMK — you must provision a key vault or KMS key, configure the encryption policy, and set up rotation schedules
-- Restrict public access explicitly (Azure only — GCP handles this by default)
+- Enforce public-access restrictions with policy (Azure Policy / GCP organization policy) so the private default cannot be quietly reversed
 - Enable storage access logging — reads, writes, and deletes against your buckets/containers are not logged unless you turn on storage analytics or GCS audit logging
 - Configure data lifecycle policies — automatic deletion or archival of aged data requires manual setup on both platforms
 
