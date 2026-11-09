@@ -15,14 +15,14 @@ Based on findings from our evaluation of default IaaS configurations. These are 
 - [ ] Enable PIM (Privileged Identity Management) for all privileged role assignments
 
 ### Network Security
-- [ ] Enable NSG Flow Logs on every Network Security Group
+- [ ] Enable VNet flow logs on every virtual network (NSG flow logs can no longer be created after June 30, 2025)
 - [ ] Route Flow Logs to a Log Analytics Workspace or Storage Account
 - [ ] Review and tighten NSG inbound rules — remove any `Any` source rules
 - [ ] Enable Azure Firewall or a WAF for internet-facing resources
 - [ ] Use Private Endpoints for storage accounts, databases, and Key Vault to remove public endpoints
 
 ### Storage Security
-- [ ] **Disable public blob access** on all storage accounts (not the default — must be set manually)
+- [ ] **Keep anonymous blob access disallowed** on all storage accounts and enforce it with Azure Policy (off by default for new accounts, but can be re-enabled)
 - [ ] Enable Customer-Managed Keys via Azure Key Vault for all storage accounts holding sensitive data
 - [ ] Configure automated key rotation in Key Vault
 - [ ] Enable storage account diagnostic logging (read, write, delete operations)
@@ -102,8 +102,8 @@ Based on findings from our evaluation of default IaaS configurations. These are 
 
 If you can only do a few things immediately, do these first:
 
-1. **Enable network flow logs** — NSG Flow Logs (Azure) / VPC Flow Logs (GCP). Biggest visibility gain for least effort.
-2. **Restrict public access on storage** — Azure requires explicit action; verify GCP buckets are clean.
+1. **Enable network flow logs** — VNet flow logs (Azure) / VPC Flow Logs (GCP). Biggest visibility gain for least effort.
+2. **Enforce storage public-access restrictions** — back the private default with Azure Policy / GCP organization policy, and check older accounts and buckets.
 3. **Scope down service account / managed identity permissions** — reduces blast radius of any compromise.
 4. **Enable Data Access Audit Logs** (GCP) or Diagnostic Settings (Azure) — creates the audit trail for compliance.
 5. **Enable CMEK/CMK** — required for most regulated workloads; gets you control over your encryption keys.
