@@ -8,6 +8,8 @@ Most cloud security incidents don't start with sophisticated attacks — they st
 
 Provisioned virtual machines and cloud storage on both platforms using only default settings, then systematically evaluated each across four dimensions: IAM and network controls, storage security, logging and monitoring, and encryption.
 
+**Result:** 12 default-configuration gaps (6 per platform) and a 62-control CIS/NIST-aligned hardening checklist.
+
 This is directly relevant to real enterprise cloud deployments. Organizations frequently assume "cloud-native" means "secure by default." This project shows exactly why that assumption is wrong on both platforms — and documents the specific configurations that need to change.
 
 ---
@@ -20,7 +22,7 @@ cloud-security-iaas/
 ├── README.md                                      ← You are here
 │
 ├── docs/
-│   ├── IaaS-Security-Posture-Azure-vs-GCP.pdf    ← Full research report
+│   ├── IaaS-Security-Posture-Azure-vs-GCP.pdf    ← Full research report (April 2025 — see CHANGELOG for later corrections)
 │   ├── IaaS-Security-Posture-Presentation.pdf    ← Presentation deck (presented April 2025)
 │
 ├── analysis/
@@ -50,8 +52,8 @@ The following prerequisites and steps were used to conduct the analysis. Results
 1. Log in to [portal.azure.com](https://portal.azure.com)
 2. Create a new Resource Group in your preferred region (e.g., East US)
 3. Deploy a B1s VM using the Azure Marketplace default Ubuntu 22.04 image — accept all networking defaults (this auto-creates an NSG)
-4. Deploy an Azure Blob Storage account — note that public access is **enabled** by default
-5. Navigate to Azure Monitor → NSG Flow Logs and confirm they are **off** by default
+4. Deploy an Azure Blob Storage account — check the **Allow Blob anonymous access** setting (off by default for new accounts since late 2023) and whether any Azure Policy prevents it from being turned on
+5. Navigate to Network Watcher → Flow logs and confirm network flow logging is **off** by default
 6. Navigate to Defender for Cloud and note the Secure Score baseline with no custom configuration
 
 **GCP steps:**
@@ -70,8 +72,8 @@ The following prerequisites and steps were used to conduct the analysis. Results
 
 | Area | Default State | Risk |
 |---|---|---|
-| NSG Flow Logs | **Disabled** | No network traffic visibility — lateral movement goes undetected |
-| Public Access on Blob Storage | **Enabled** | Storage containers publicly accessible unless explicitly restricted |
+| Network Flow Logs (NSG / VNet) | **Disabled** | No network traffic visibility — lateral movement goes undetected |
+| Anonymous Blob Access Guardrail | **Not enforced** | Anonymous access is off at the account level by default, but one account setting re-enables it and no policy blocks that by default |
 | Double Encryption | **Disabled** | Platform-managed keys only — no customer key control by default |
 | VM Monitoring / Diagnostics | **Optional** | Boot diagnostics and performance metrics require manual activation |
 | Managed Identity Permissions | **Over-permissioned** | Default role assignments broader than least-privilege requires |
@@ -89,7 +91,7 @@ The following prerequisites and steps were used to conduct the analysis. Results
 | Log Retention | **30 days default** | Extendable via Cloud Storage routing, but requires manual setup |
 
 ### Where GCP Has an Edge by Default
-- Public access on Cloud Storage is **disabled** by default — Azure enables it
+- Public access prevention on Cloud Storage is enforced at the bucket and organization level; Azure relies on an account-level setting that can be switched back on
 - IAM supports object-level policies natively — no need for SAS tokens
 - Logs can be routed to Cloud Storage for cost-effective long-term retention beyond 30 days (Azure routes to Log Analytics Workspace at higher cost per GB)
 - Workload Identity Federation eliminates long-lived service account keys
@@ -116,8 +118,8 @@ It isn't. The defaults are a starting point, not a finished posture.
 
 Neither platform is "secure by default" in any meaningful enterprise sense. The defaults are a starting point, not a finish line. Both require the same fundamental hardening steps:
 
-1. Enable network flow logs (NSG Flow Logs on Azure, VPC Flow Logs on GCP)
-2. Restrict public access on storage
+1. Enable network flow logs (VNet flow logs on Azure, VPC Flow Logs on GCP)
+2. Enforce storage public-access restrictions with policy, not just default settings
 3. Scope down service account and managed identity permissions to least privilege
 4. Enable Customer-Managed Encryption Keys
 5. Configure SIEM integration and customize alert thresholds
