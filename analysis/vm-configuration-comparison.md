@@ -34,7 +34,7 @@
 | Encryption in Transit | TLS 1.2+ | TLS 1.3 enforced | TLS 1.2+ | TLS 1.3 enforced |
 | Key Management | Azure Key Vault (not activated) | CMK enabled, rotation automated (CSK as advanced option) | Cloud KMS (not activated) | CMEK enabled, rotation scheduled |
 | Threat Detection | Defender for Cloud (basic) | Defender with custom policies | Security Command Center (basic) | SCC Premium + custom findings |
-| Network Logging | NSG Flow Logs off | NSG Flow Logs enabled + Sentinel | VPC Flow Logs off | VPC Flow Logs enabled + Chronicle |
+| Network Logging | Flow logs off | VNet flow logs enabled + Sentinel | VPC Flow Logs off | VPC Flow Logs enabled + Chronicle |
 
 ---
 
@@ -45,7 +45,7 @@ Azure uses **Microsoft Entra ID** (formerly Azure Active Directory) in conjuncti
 
 **The default gap:** Over-permissioned role assignments are common in default deployments. The built-in Contributor or Owner roles give far broader access than a VM actually needs to function. Most environments should be using custom roles scoped to specific resource operations.
 
-NSG (Network Security Group) logging is off by default. This means network traffic patterns — including lateral movement between VMs — are invisible unless you explicitly enable NSG Flow Logs.
+NSG (Network Security Group) logging is off by default. This means network traffic patterns — including lateral movement between VMs — are invisible unless you explicitly enable flow logs (VNet flow logs on current deployments).
 
 ### GCP
 GCP's IAM supports role bindings at multiple levels (organization → folder → project → resource → object). This granularity is a significant advantage for least-privilege enforcement. Workload Identity Federation allows external workloads to authenticate without creating long-lived service account keys.
@@ -58,7 +58,7 @@ GCP's IAM supports role bindings at multiple levels (organization → folder →
 
 This is the most operationally significant gap on both platforms:
 
-- **Azure** — NSG Flow Logs must be manually enabled. Without them, you have no record of which IPs are communicating with your VMs, no visibility into rejected traffic, and no baseline for anomaly detection.
+- **Azure** — Flow logs must be manually enabled (VNet flow logs going forward; NSG flow logs are being retired). Without them, you have no record of which IPs are communicating with your VMs, no visibility into rejected traffic, and no baseline for anomaly detection.
 - **GCP** — VPC Flow Logs must be manually enabled. Same problem — no network traffic record, no anomaly baseline.
 
 Both platforms offer the tooling to fix this. Neither enables it out of the box.
