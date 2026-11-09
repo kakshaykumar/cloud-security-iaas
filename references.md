@@ -70,7 +70,7 @@ For deeper context on the topics covered in this project:
 - **Google Security Command Center** — Threat detection and vulnerability findings
   https://cloud.google.com/security-command-center/docs
 
-- **Azure NSG Flow Logs** — Enabling network visibility
+- **Azure VNet Flow Logs** — Enabling network visibility (successor to NSG flow logs, which retire September 30, 2027)
   https://learn.microsoft.com/en-us/azure/network-watcher/nsg-flow-logs-overview
 
 - **GCP VPC Flow Logs** — Enabling network visibility
