@@ -14,7 +14,7 @@ The single most consistent finding across both platforms is this: the logs that 
 | Azure Monitor | Infrastructure and application metrics | On |
 | Activity Logs | Subscription-level operations | On |
 | Diagnostic Logs | Resource-level detail | Off — must be configured per resource |
-| NSG Flow Logs | Network traffic between VMs and subnets | **Off** |
+| NSG / VNet Flow Logs | Network traffic between VMs and subnets | **Off** |
 | Firewall Logs | Traffic allowed/denied by firewall rules | **Off** |
 | Microsoft Defender for Cloud | Threat detection and security recommendations | Basic tier on; advanced off |
 | Microsoft Sentinel | Cloud-native SIEM | Requires workspace setup |
@@ -37,7 +37,7 @@ The single most consistent finding across both platforms is this: the logs that 
 
 ### 1. Network Visibility — Both Platforms Fail Here
 
-NSG Flow Logs (Azure) and VPC Flow Logs (GCP) are the foundation of network security monitoring. They're the logs that would tell you:
+Network flow logs (VNet flow logs on Azure, VPC Flow Logs on GCP) are the foundation of network security monitoring. They're the logs that would tell you:
 - Which IPs are communicating with your VMs
 - Whether traffic is being allowed or blocked by your rules
 - Whether lateral movement is occurring between internal hosts
@@ -73,7 +73,7 @@ PCI-DSS requires 12 months of audit log retention (3 months immediately accessib
 
 | Gap | Azure | GCP |
 |---|---|---|
-| Network traffic logging | NSG Flow Logs off | VPC Flow Logs off |
+| Network traffic logging | Flow logs off | VPC Flow Logs off |
 | Firewall logging | Off by default | Off by default |
 | Data access auditing | Diagnostic Logs require per-resource setup | Data Access Audit Logs off globally |
 | SIEM out of the box | Sentinel requires workspace + configuration | Chronicle requires separate provisioning |
@@ -87,7 +87,7 @@ PCI-DSS requires 12 months of audit log retention (3 months immediately accessib
 For any production-grade deployment on either platform, these should be treated as non-negotiable baseline configurations — not optional enhancements:
 
 **Azure:**
-- Enable NSG Flow Logs for every Network Security Group
+- Enable VNet flow logs for every virtual network (replaces NSG flow logs, which can no longer be created after June 30, 2025 and retire September 30, 2027)
 - Enable Diagnostic Settings on every critical resource (VMs, storage, Key Vault)
 - Configure Microsoft Sentinel workspace and connect data connectors
 - Set log retention to minimum 90 days in Log Analytics; route to Storage Account for longer-term retention
@@ -106,9 +106,9 @@ For any production-grade deployment on either platform, these should be treated 
 
 Enabling a control and confirming it works are two different things. After each enablement step, verify delivery:
 
-**Azure — Verify NSG Flow Logs:**
+**Azure — Verify VNet Flow Logs:**
 ```bash
-# In Azure Portal: Monitor → Network Watcher → NSG Flow Logs
+# In Azure Portal: Network Watcher → Flow logs
 # Confirm status shows "Enabled" and the storage account is receiving .json log files
 # Or via CLI:
 az network watcher flow-log show --resource-group <rg> --nsg <nsg-name>
