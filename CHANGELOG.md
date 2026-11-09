@@ -4,6 +4,16 @@ Cloud platform default configurations change with service updates. This file rec
 
 ---
 
+## [1.1.0] — November 2026
+
+**Corrections after re-checking against Microsoft documentation**
+
+- **Azure Blob anonymous access:** the April 2025 finding listed public access as *Enabled* by default. Microsoft changed this default in late 2023 — new storage accounts are created with anonymous blob access **disallowed** at the account level. The finding is reframed as a guardrail gap: the setting can be re-enabled per account and no policy prevents that by default. Gap count is unchanged at 12.
+- **Azure flow logs:** Microsoft stopped allowing new NSG flow logs after June 30, 2025 and retires them on September 30, 2027. Recommendations now point to **VNet flow logs**, which are also off by default.
+- The PDF report and presentation in `docs/` reflect the original April 2025 wording and have not been regenerated.
+
+---
+
 ## [1.0.0] — April 2025
 
 **Initial release — findings validated against live Azure and GCP consoles**
@@ -14,7 +24,7 @@ Cloud platform default configurations change with service updates. This file rec
 
 ### Key default behaviors confirmed at time of evaluation:
 - Azure NSG Flow Logs: **Disabled** by default
-- Azure Blob Storage public access: **Enabled** by default
+- Azure Blob Storage public access: recorded as **Enabled** by default (corrected in 1.1.0 — see above)
 - Azure Log retention (Activity Logs): **30 days** by default
 - GCP VPC Flow Logs: **Disabled** by default
 - GCP Data Access Audit Logs: **Disabled** by default
